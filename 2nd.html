@@ -1,125 +1,393 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resume Menu</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Resume Builder</title>
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --sidebar-bg: #34495e;
+            --accent-color: #555;
+        }
 
-<style>
-    body {
-        margin: 0;
-        font-family: Arial, Helvetica, sans-serif;
-        background: #ffffff;
-        color: #222;
-    }
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    /* Header */
-    .header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 16px 20px;
-        border-bottom: 1px solid #eee;
-    }
+        body {
+            margin: 0;
+            background-color: #e9ebee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    .logo {
-        font-size: 20px;
-        font-weight: bold;
-        color: #1a73e8;
-    }
+        /* Toolbar */
+        .toolbar {
+            width: 100%;
+            background: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-    .logo small {
-        display: block;
-        font-size: 12px;
-        color: #777;
-        font-weight: normal;
-    }
+        .color-options {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .close {
-        font-size: 28px;
-        color: #1a73e8;
-        cursor: pointer;
-    }
+        .swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
 
-    /* Menu */
-    .menu {
-        padding: 10px 20px 30px;
-    }
+        .swatch:hover { transform: scale(1.2); }
 
-    .section-title {
-        font-size: 13px;
-        letter-spacing: 2px;
-        color: #999;
-        margin: 25px 0 10px;
-    }
+        .btn-group button {
+            padding: 8px 16px;
+            margin-left: 10px;
+            cursor: pointer;
+            border: 1px solid #34495e;
+            background: white;
+            color: #34495e;
+            font-weight: bold;
+            border-radius: 4px;
+        }
 
-    .menu-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 14px 0;
-        font-size: 20px;
-        border-bottom: 1px solid #f1f1f1;
-        cursor: pointer;
-    }
+        .btn-group .download-btn {
+            background: #34495e;
+            color: white;
+        }
 
-    .menu-item span {
-        color: #666;
-        font-size: 22px;
-    }
+        /* Resume Paper */
+        .resume-container {
+            width: 210mm; /* A4 Width */
+            min-height: 297mm; /* A4 Height */
+            background: white;
+            margin: 30px 0;
+            display: flex;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
 
-    .simple-link {
-        font-size: 20px;
-        padding: 14px 0;
-        border-bottom: 1px solid #f1f1f1;
-    }
+        /* Sidebar */
+        .sidebar {
+            width: 32%;
+            background-color: var(--sidebar-bg);
+            color: white;
+            padding: 40px 25px;
+            transition: background 0.3s ease;
+        }
 
-    .account {
-        margin-top: 20px;
-        font-size: 20px;
-        color: #1a73e8;
-        font-weight: bold;
-    }
-</style>
+        .photo-container {
+            width: 180px;
+            height: 180px;
+            background: #ffffff33;
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            border: 4px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .upload-text {
+            font-size: 12px;
+            text-align: center;
+            color: #eee;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar h3 {
+            font-size: 18px;
+            letter-spacing: 2px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 5px;
+            margin-top: 40px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .contact-section { margin-top: 50px; }
+        .contact-item { margin-bottom: 20px; display: flex; align-items: flex-start; gap: 10px; }
+        .contact-item span { font-size: 18px; }
+        .contact-item h4 { margin: 0; font-size: 12px; letter-spacing: 1px; opacity: 0.8; }
+        .contact-item p { margin: 0; font-size: 13px; }
+
+        /* Main Content */
+        .main-content {
+            width: 68%;
+            padding: 40px;
+            color: #333;
+        }
+
+        .name-header {
+            background-color: #e0e0e0;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .name-header h1 {
+            margin: 0;
+            font-size: 42px;
+            color: #2c3e50;
+            letter-spacing: 3px;
+        }
+
+        .name-header p {
+            margin: 5px 0 0;
+            font-size: 18px;
+            letter-spacing: 4px;
+            color: #555;
+        }
+
+        .content-body {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-title::after {
+            content: "";
+            flex-grow: 1;
+            margin-left: 15px;
+            height: 1px;
+        }
+
+        .editable-area {
+            font-size: 14px;
+            line-height: 1.6;
+            outline: none;
+            padding: 5px;
+            border: 1px dashed transparent;
+        }
+
+        .editable-area:hover {
+            border-color: #ccc;
+        }
+
+        /* UI States */
+        .preview-mode .toolbar, 
+        .preview-mode .swatch {
+            display: none !important;
+        }
+
+        .preview-mode .editable-area {
+            border: none;
+        }
+
+        @media print {
+            .toolbar { display: none !important; }
+            body { background: white; }
+            .resume-container { margin: 0; box-shadow: none; }
+            .editable-area { border: none !important; }
+        }
+    </style>
 </head>
-
 <body>
 
-<!-- Header -->
-<div class="header">
-    <div class="logo">
-        resume.io
-        <small>by career.io</small>
+    <div class="toolbar">
+        <div class="color-options">
+            <span>Sidebar Color:</span>
+            <div class="swatch" style="background: #34495e;" onclick="changeTheme('#34495e')"></div>
+            <div class="swatch" style="background: #2c3e50;" onclick="changeTheme('#2c3e50')"></div>
+            <div class="swatch" style="background: #1e3d30;" onclick="changeTheme('#1e3d30')"></div>
+            <div class="swatch" style="background: #4a2c2c;" onclick="changeTheme('#4a2c2c')"></div>
+            <div class="swatch" style="background: #2c3b4a;" onclick="changeTheme('#2c3b4a')"></div>
+        </div>
+        <div class="btn-group">
+            <button onclick="togglePreview()" id="previewBtn">PREVIEW</button>
+            <button class="download-btn" onclick="downloadResume()">DOWNLOAD PDF</button>
+        </div>
     </div>
-    <div class="close">✕</div>
-</div>
 
-<!-- Menu -->
-<div class="menu">
+    <div class="resume-container" id="resume">
+        
+        <aside class="sidebar">
+            <div class="photo-container" onclick="document.getElementById('fileInput').click()">
+                <img id="userPhoto" src="" alt="Profile">
+                <div id="uploadPlaceholder" class="upload-text">
+                    <span style="font-size: 30px;">📷</span><br>Upload Photo
+                </div>
+            </div>
+            <input type="file" id="fileInput" hidden accept="image/*" onchange="previewImage(event)">
 
-    <div class="section-title">RESUME</div>
+            <h3 contenteditable="true">SKILLS</h3>
+            <div class="editable-area" contenteditable="true">
+                <ul>
+                    <li>Adobe InDesign</li>
+                    <li>Responsive Layout Design</li>
+                    <li>Logo & Icon Design</li>
+                    <li>UI/UX Design</li>
+                </ul>
+            </div>
 
-    <div class="menu-item">Resume Templates <span>⌄</span></div>
-    <div class="menu-item">Resume Examples <span>⌄</span></div>
-    <div class="menu-item">Most Popular <span>⌄</span></div>
+            <div class="contact-section">
+                <div class="contact-item">
+                    <span>📞</span>
+                    <div>
+                        <h4>PHONE</h4>
+                        <p contenteditable="true">+123-456-7890</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span>✉️</span>
+                    <div>
+                        <h4>EMAIL</h4>
+                        <p contenteditable="true">hello@reallygreatsite.com</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span>🌐</span>
+                    <div>
+                        <h4>SOCIAL MEDIA</h4>
+                        <p contenteditable="true">@reallygreatsite</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
 
-    <div class="section-title">COVER LETTER</div>
+        <main class="main-content">
+            <header class="name-header">
+                <h1 contenteditable="true">DANIEL GALLEGO</h1>
+                <p contenteditable="true">• GRAPHIC DESIGNER</p>
+            </header>
 
-    <div class="menu-item">Cover Letter Templates <span>⌄</span></div>
-    <div class="menu-item">Cover Letter Examples <span>⌄</span></div>
-    <div class="menu-item">Cover Letter Builder <span>⌄</span></div>
+            <div class="content-body">
+                <section>
+                    <div class="section-title">ABOUT ME</div>
+                    <div class="editable-area" contenteditable="true">
+                        I am a passionate and detail-oriented Graphic Designer with [X] years of experience creating visual content for digital and print media. I specialize in branding and layout design.
+                    </div>
+                </section>
 
-    <div class="section-title">RESOURCES</div>
+                <section>
+                    <div class="section-title">EXPERIENCE</div>
+                    <div class="editable-area" contenteditable="true">
+                        <strong>ABC Creative Studio – Jakarta, Indonesia | Jan 2020 – Present</strong>
+                        <ul>
+                            <li>Designed visual assets, social media creatives, and marketing materials for 30+ clients across various industries.</li>
+                            <li>Collaborated with marketing teams to create cohesive brand identities.</li>
+                        </ul>
+                    </div>
+                </section>
 
-    <div class="menu-item">Resources <span>⌄</span></div>
-    <div class="menu-item">Blog Categories <span>⌄</span></div>
+                <section>
+                    <div class="section-title">EDUCATION</div>
+                    <div class="editable-area" contenteditable="true">
+                        <strong>Bachelor of Fine Arts (BFA) – Graphic Design</strong><br>
+                        XYZ University, Jakarta | 20XX – 20XX
+                        <ul>
+                            <li>Focused on Branding, Illustration, and Digital Media</li>
+                            <li>Capstone Project: Redesigned a corporate brand identity for a local company</li>
+                        </ul>
+                    </div>
+                </section>
 
-    <div class="simple-link">About Us</div>
-    <div class="simple-link">FAQ</div>
+                <section>
+                    <div class="section-title">CERTIFICATE</div>
+                    <div class="editable-area" contenteditable="true">
+                        <strong>Certificates & Training</strong>
+                        <ul>
+                            <li>Adobe Certified Professional in Photoshop & Illustrator (20XX)</li>
+                            <li>UI/UX Design Certification – Google (20XX)</li>
+                            <li>Visual Branding & Logo Design – Udemy (20XX)</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
 
-    <div class="account">My Account →</div>
+    <script>
+        // Photo Upload Logic
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                const output = document.getElementById('userPhoto');
+                const placeholder = document.getElementById('uploadPlaceholder');
+                output.src = reader.result;
+                output.style.display = 'block'; // Show the image
+                placeholder.style.display = 'none'; // Hide the "Upload Photo" text
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
 
-</div>
+        // Color Theme Logic
+        function changeTheme(color) {
+            document.documentElement.style.setProperty('--sidebar-bg', color);
+        }
 
+        // Preview Mode Toggle
+        let isPreview = false;
+        function togglePreview() {
+            isPreview = !isPreview;
+            const body = document.body;
+            const btn = document.getElementById('previewBtn');
+            
+            if(isPreview) {
+                body.classList.add('preview-mode');
+                btn.innerText = "EDIT MODE";
+            } else {
+                body.classList.remove('preview-mode');
+                btn.innerText = "PREVIEW";
+            }
+        }
+
+        // Download Logic (Opens Print Dialog - Choose "Save as PDF")
+        function downloadResume() {
+            // Force preview mode before printing
+            const body = document.body;
+            const originalClass = body.className;
+            body.classList.add('preview-mode');
+            
+            window.print();
+            
+            // Revert after printing
+            if(!isPreview) {
+                body.className = originalClass;
+            }
+        }
+    </script>
 </body>
 </html>
